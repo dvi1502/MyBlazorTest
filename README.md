@@ -1,1 +1,2 @@
 # MyBlazorTest
+With NHibrernate sessions.
