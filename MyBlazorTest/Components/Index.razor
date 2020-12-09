@@ -1,7 +1,4 @@
 ﻿@page "/"
-@using MyBlazorTest.Core
-@using MyBlazorTest.Core.Models
-@inject DataAccess Data;
 
 <h1>Hello, world!</h1>
 
@@ -9,61 +6,5 @@ Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
-@*<p>
-    <a asp-action="Create">Create New</a>
-</p>*@
-
-
-@if (_cats == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-        <tr>
-            <th>
-                Name
-            </th>
-            <th>
-                Sex
-            </th>
-            <th>
-                Weight
-            </th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var item in _cats)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Sex</td>
-                <td>@item.Weight</td>
-            </tr>
-        }
-        </tbody>
-        @*<td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            </td>*@
-    </table>
-}
-
-
 @code {
-
-    private IList<Cat> _cats;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
-        await base.OnInitializedAsync().ConfigureAwait(false);
-
-        var task = Data.GetCatsAsync(0, 100).ConfigureAwait(false).GetAwaiter();
-        _cats = task.GetResult();
-    }
 }
