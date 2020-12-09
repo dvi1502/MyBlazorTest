@@ -45,10 +45,37 @@ namespace MyBlazorTest.Core
 
         #region Public and private methods - CRUD
 
-        public async Task CreateAsync(BaseEntity entity)
+        public async Task CreateAsync(BaseEntity entity, [CallerMemberName] string memberName = "")
         {
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+            if (SessionFactory is null)
+                return;
 
+            ISession session = null;
+            ITransaction transaction = null;
+            try
+            {
+                session = SessionFactory.OpenSession();
+                transaction = session.BeginTransaction();
+                await session.SaveOrUpdateAsync(entity).ConfigureAwait(false);
+                await session.FlushAsync().ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
+                Console.WriteLine($"{memberName}. try");
+            }
+            catch (Exception ex)
+            {
+                if (!(transaction is null))
+                    await transaction.RollbackAsync().ConfigureAwait(false);
+                Console.WriteLine($"{memberName}. {ex.Message}");
+            }
+            finally
+            {
+                //session.Close();
+                Console.WriteLine($"{memberName}. finally");
+                transaction?.Dispose();
+                session?.Disconnect();
+            }
+            Console.WriteLine($"{memberName}. Disconnect");
         }
 
         public async Task<BaseEntity[]> ReadAsync(ReadConfiguration configuration)
