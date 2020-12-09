@@ -1,16 +1,10 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MyBlazorTest.DAL;
+using MyBlazorTest.Core;
 using MyBlazorTest.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyBlazorTest
 {
@@ -27,12 +21,7 @@ namespace MyBlazorTest
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
-            var connStr = Configuration.GetConnectionString("DefaultConnection");
-            var _sessionFactory = DataAccess.ConfigureServices(connStr, GetType());
-
-            services.AddSingleton(_sessionFactory);
-            services.AddScoped(factory => _sessionFactory.OpenSession());
+            services.AddSingleton<DataAccess>();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
