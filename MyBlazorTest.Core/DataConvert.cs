@@ -30,16 +30,16 @@ namespace MyBlazorTest.Core
 
         #region Public and private methods
 
-        public Cat[] ToCats(BaseEntity[] entities)
+        public CatEntity[] ToCats(BaseEntity[] entities)
         {
-            var result = new Cat[0];
+            var result = new CatEntity[0];
             if (!(entities is null) && entities.Length > 0)
             {
-                result = new Cat[entities.Length];
+                result = new CatEntity[entities.Length];
                 var i = 0;
                 foreach (var entity in entities)
                 {
-                    result[i] = (Cat)entity;
+                    result[i] = (CatEntity)entity;
                     i++;
                 }
             }

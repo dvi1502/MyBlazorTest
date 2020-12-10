@@ -1,13 +1,13 @@
-﻿namespace MyBlazorTest.Core.Models
+﻿namespace MyBlazorTest.Core
 {
-    public class ReadConfiguration
+    public class DataConfiguration
     {
         public bool Use { get; set; }
         public bool OrderAsc { get; set; }
         public int PageNo { get; set; }
         public int PageSize { get; set; }
 
-        public ReadConfiguration(bool use = true, bool orderAsc = true, int pageNo = 0, int pageSize = 10)
+        public DataConfiguration(bool use = true, bool orderAsc = true, int pageNo = 0, int pageSize = 10)
         {
             Use = use;
             OrderAsc = orderAsc;

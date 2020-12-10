@@ -1,0 +1,129 @@
+﻿@page "/catTableComponent"
+@using MyBlazorTest.Core
+@inject DataAccess Data
+@inject DialogService Dialog
+@inject NotificationService Notification
+@inject TooltipService Tooltip
+
+<RadzenPanel Style="width:100%; height:15%; " AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenLabel Text="Configuration" />
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCheckBox TValue="bool" @bind-value=@Data.Configuration.Use />
+        <RadzenLabel Text=" Use" />
+        <RadzenCheckBox TValue="bool" @bind-value=@Data.Configuration.OrderAsc />
+        <RadzenLabel Text=" Order ascending" />
+        <RadzenNumeric TValue="int" Min="1" Max="999_999" @bind-value=@Data.Configuration.PageNo />
+        <RadzenLabel Text=" PageNo" />
+        <RadzenNumeric TValue="int" Min="1" Max="1_000" @bind-value=@Data.Configuration.PageSize />
+        <RadzenLabel Text=" PageSize" />
+    </ChildContent>
+</RadzenPanel>
+
+<RadzenPanel Style="width:100%; height:15%; " AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenLabel Text="Actions" />
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                      Click="@ActionCreateAsync" Text="Create" />
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                      Click="@ActionReadAsync" Text="Read" />
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                      Click="@ActionUpdateAsync" Text="Update" />
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                      Click="@ActionDeleteAsync" Text="Delete" />
+    </ChildContent>
+</RadzenPanel>
+
+<RadzenPanel Style="width:100%; height:60%; " AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenLabel Text="Data table" />
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard>
+            @if (Cats == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <RadzenGrid Data=@Cats TItem="Core.Models.CatEntity" Value=@Cat
+                            RowSelect=@(args => RowSelectAsync(args)) RowDoubleClick=@(args => RowDoubleClickAsync(args))
+                            AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
+                            AllowPaging="true" PageSize="@Data.Configuration.PageSize" AllowSorting="true" ColumnWidth="200px">
+                    <Columns>
+                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Id" Title="ID" Type="int" />
+                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Name" Title="Имя" Type="string" />
+                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Sex" Title="Пол" Type="string" />
+                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Weight" Title="Вес" Type="bool" />
+                    </Columns>
+                </RadzenGrid>
+            }
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
+
+@code {
+    public Core.Models.CatEntity[] Cats { get; set; }
+    public Core.Models.CatEntity Cat { get; set; }
+    private readonly DataConvert _convert = DataConvert.Instance;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        await base.OnInitializedAsync().ConfigureAwait(false);
+
+        await ActionReadAsync().ConfigureAwait(false);
+    }
+
+    private async Task ActionCreateAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+
+    }
+
+    private async Task ActionReadAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+
+        var entities = new Core.Models.BaseEntity[0];
+        var task = Task.Run(async () =>
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+            entities = await Data.ReadAsync().ConfigureAwait(false);
+        });
+        task.Wait();
+        Cats = _convert.ToCats(entities);
+    }
+
+    private async Task ActionUpdateAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+
+    }
+
+    private async Task ActionDeleteAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+
+    }
+
+    private async Task RowSelectAsync(Core.Models.CatEntity cat)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+    }
+
+    private async Task RowDoubleClickAsync(Core.Models.CatEntity cat)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        await Dialog.OpenAsync<Components.CatEntityComponent>($"Запись: {cat.Name}",
+        new Dictionary<string, object>()
+        {
+            { "Cat", cat },
+        },
+        new DialogOptions() { Width = "1024px", Height = "768px" });
+        Console.WriteLine("RowDoubleClick 2");
+    }
+}

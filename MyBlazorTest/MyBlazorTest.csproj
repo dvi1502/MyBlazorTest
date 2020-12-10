@@ -20,4 +20,8 @@
     <ProjectReference Include="..\MyBlazorTest.Core\MyBlazorTest.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+
 </Project>

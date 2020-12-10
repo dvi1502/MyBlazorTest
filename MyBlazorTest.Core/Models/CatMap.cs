@@ -2,16 +2,7 @@
 
 namespace MyBlazorTest.Core.Models
 {
-    public class Cat : BaseEntity
-    {
-        public virtual string Name { get; set; }
-
-        public virtual char Sex { get; set; }
-
-        public virtual float Weight { get; set; }
-    }
-    
-    public class CatMap : ClassMap<Cat>
+    public class CatMap : ClassMap<CatEntity>
     {
         public CatMap()
         {

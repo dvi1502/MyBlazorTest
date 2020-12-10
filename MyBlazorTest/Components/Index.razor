@@ -1,10 +1,61 @@
 ﻿@page "/"
+@inject MyBlazorTest.Core.DataAccess Data
 
-<h1>Hello, world!</h1>
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
 
-Welcome to your new app.
+<h1>DataAccess</h1>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<RadzenLabel Style="margin-left: 30px" Text="Session count:" />
+<RadzenNumeric Style="margin-left: 10px" TValue="int" @bind-value=@Data.SessionsCount
+               Change=@(args => Change<int>(args, "SessionsCount")) />
+<RadzenLabel Style="margin-left: 30px" Text="IsOpen:" />
+<RadzenCheckBox Style="margin-left: 10px" TValue="bool" @bind-value=@Data.SessionsIsOpen Disabled="true" />
+<RadzenLabel Style="margin-left: 30px" Text="IsConnected:" />
+<RadzenCheckBox Style="margin-left: 10px" TValue="bool" @bind-value=@Data.SessionsIsConnected Disabled="true" />
 
 @code {
+    private int _sessionsCount = 0;
+    private bool _update;
+    [Parameter]
+    public bool Update
+    {
+        get => _update;
+        set
+        {
+            _update = value;
+            var task = Task.Run(async () =>
+            {
+                await CallUpdate().ConfigureAwait(false);
+            });
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        await base.OnInitializedAsync().ConfigureAwait(false);
+
+        await CallUpdate().ConfigureAwait(false);
+    }
+
+    public async Task CallUpdate()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+
+        //Console.WriteLine($"Data.SessionsCount: {Data.SessionsCount}");
+        //Console.WriteLine($"Data.SessionsIsConnected: {Data.SessionsIsConnected}");
+        //Console.WriteLine($"Data.SessionsIsOpen: {Data.SessionsIsOpen}");
+    }
+
+    private void Change<T>(T value, string name)
+    {
+        //if (name.Equals("SessionsCount"))
+        //{
+        //    _sessionsCount = Convert.ToInt32(value);
+        //}
+        StateHasChanged();
+    }
 }

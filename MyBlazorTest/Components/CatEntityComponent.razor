@@ -1,0 +1,59 @@
+﻿@page "/catEntityComponent"
+@using MyBlazorTest.Core
+@inject DataAccess Data
+@inject DialogService Dialog
+@inject NotificationService Notification
+@inject TooltipService Tooltip
+
+<RadzenCard Style="margin-bottom: 0px;">
+    <div class="row" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+        <RadzenLabel Style="align-self: start; width: 15%; height: 25px; " Text="Имя" />
+    </div>
+</RadzenCard>
+
+<br Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; " />
+<div class="row">
+    <div class="col-md-6" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+        <RadzenButton Style="margin-bottom: 10px; width: 150px" Text="Сохранить" 
+                      Click="@SaveAsync" ButtonStyle="ButtonStyle.Secondary" />
+    </div>
+    <div class="col-md-6" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+        <RadzenButton Style="margin-bottom: 10px; width: 150px" Text="Закрыть"
+                      Click="@CancelAsync" ButtonStyle="ButtonStyle.Secondary" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Core.Models.CatEntity Cat { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        await base.OnInitializedAsync().ConfigureAwait(false);
+        Console.WriteLine("catEntityComponent. OnInitializedAsync 2");
+        //await ActionReadAsync().ConfigureAwait(false);
+    }
+
+    private async Task GetDataAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+    }
+
+    private async Task SaveAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        var result = false;
+        Dialog.Close(true);
+        var message = result
+            ? new NotificationMessage { Severity = NotificationSeverity.Info, Summary = $"Устройство {Cat.Name}", Detail = "Сохранено успешно", Duration = 4000 }
+            : new NotificationMessage { Severity = NotificationSeverity.Error, Summary = $"Устройство {Cat.Name}", Detail = "Ошибка сохранения!", Duration = 4000 };
+        Notification.Notify(message);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        Dialog.Close(false);
+    }
+}
