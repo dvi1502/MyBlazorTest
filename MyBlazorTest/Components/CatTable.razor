@@ -3,68 +3,80 @@
 @using MyBlazorTest.Core.Models
 @inject DataAccess Data;
 
-<div class="card" style="width:100%">
-    <div class="card-body">
-        <h3 class="card-title">Configuration</h3>
-        <input style="width: 5%" type="checkbox" @bind="_configuration.Use" />
-        <span style="width: 25%">Use</span>
-        <span style="width: 5%"></span>
-        <input style="width: 5%; align-content: end; " type="checkbox" @bind="_configuration.OrderAsc" />
-        <span style="width: 25%">Order ascending</span>
-        <br />
-        <input style="width: 5%" type="text" @bind="_configuration.PageNo" />
-        <span style="width: 25%">PageNo</span>
-        <span style="width: 5%"></span>
-        <input style="width: 5%; align-content: end; " type="text" @bind="_configuration.PageSize" />
-        <span style="width: 25%">PageSize</span>
-    </div>
-</div>
+<RadzenPanel Style="width: 100%" AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenLabel Text="Configuration" />
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenCard>
+            <RadzenCheckBox TValue="bool" @bind-Value="_configuration.Use" />
+            <RadzenLabel Text=" Use" />
+            <RadzenCheckBox TValue="bool" @bind-Value="_configuration.OrderAsc" />
+            <RadzenLabel Text=" Order ascending" />
+            <RadzenNumeric TValue="int" Min="1" Max="10" @bind-value="_configuration.PageNo" />
+            <RadzenLabel Text=" PageNo" />
+            <RadzenNumeric TValue="int" Min="1" Max="10" @bind-value="_configuration.PageSize" />
+            <RadzenLabel Text=" PageSize" />
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
 
-<div class="card" style="width: 100%">
-    <div class="card-body">
-        <button class="btn btn-dark" style="width: 20%" @onclick="ActionCreateAsync">Create</button>
-        <span style="width: 5%" ></span>
-        <button class="btn btn-dark" style="width: 20%" @onclick="ActionReadAsync">Read</button>
-        <span style="width: 5%"></span>
-        <button class="btn btn-dark" style="width: 20%" @onclick="ActionUpdateAsync">Update</button>
-        <span style="width: 5%"></span>
-        <button class="btn btn-dark" style="width: 20%" @onclick="ActionDeleteAsync">Delete</button>
-    </div>
-</div>
+<RadzenPanel Style="width: 100%" AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenLabel Text="Actions" />
+    </HeaderTemplate>
+    <ChildContent >
+        <RadzenCard>
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                          Click="@ActionCreateAsync" Text="Create" />
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                          Click="@ActionReadAsync" Text="Read" />
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                          Click="@ActionUpdateAsync" Text="Update" />
+            <RadzenButton ButtonStyle="ButtonStyle.Primary" Style="margin-left: 20px; width: 20%; "
+                          Click="@ActionDeleteAsync" Text="Delete" />
+        </RadzenCard>
+    </ChildContent>
+</RadzenPanel>
 
-<br />
-@if (_cats == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Sex</th>
-                <th>Weight</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in _cats)
-            {
-                <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Sex</td>
-                    <td>@item.Weight</td>
-                </tr>
-            }
-        </tbody>
-        @*<td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            </td>*@
-    </table>
-}
-
+<RadzenPanel Style="width: 100%" AllowCollapse="true">
+    <HeaderTemplate>
+        <RadzenLabel Text="Data table" />
+    </HeaderTemplate>
+    <ChildContent>
+        <RadzenDataList PageSize="1" WrapItems="true" AllowPaging="true" Data="@_cats" TItem="Cat">
+            <Template Context="order">
+                <RadzenCard Style="width:100%; height:50%; ">
+                    @if (_cats == null)
+                    {
+                        <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Sex</th>
+                                <th>Weight</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in _cats)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.Sex</td>
+                                    <td>@item.Weight</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }</RadzenCard>
+            </Template>
+        </RadzenDataList>
+    </ChildContent>
+</RadzenPanel>
 
 @code {
     private Cat[] _cats;
