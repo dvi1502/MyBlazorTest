@@ -1,5 +1,9 @@
 ﻿@page "/catTableComponent"
 @using MyBlazorTest.Core
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
 @inject DataAccess Data
 @inject DialogService Dialog
 @inject NotificationService Notification
@@ -42,33 +46,35 @@
         <RadzenLabel Text="Data table" />
     </HeaderTemplate>
     <ChildContent>
-        <RadzenCard>
-            @if (Cats == null)
-            {
-                <p><em>Loading...</em></p>
-            }
-            else
-            {
-                <RadzenGrid Data=@Cats TItem="Core.Models.CatEntity" Value=@Cat
-                            RowSelect=@(args => RowSelectAsync(args)) RowDoubleClick=@(args => RowDoubleClickAsync(args))
-                            AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
-                            AllowPaging="true" PageSize="@Data.Configuration.PageSize" AllowSorting="true" ColumnWidth="200px">
-                    <Columns>
-                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Id" Title="ID" Type="int" />
-                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Name" Title="Имя" Type="string" />
-                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Sex" Title="Пол" Type="string" />
-                        <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Weight" Title="Вес" Type="bool" />
-                    </Columns>
-                </RadzenGrid>
-            }
-        </RadzenCard>
+        @if (Cats == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <RadzenGrid Data=@Cats TItem="Core.Models.CatEntity" Value=@Cat
+                        RowSelect=@(args => RowSelectAsync(args)) RowDoubleClick=@(args => RowDoubleClickAsync(args))
+                        AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
+                        AllowPaging="true" PageSize="@Data.Configuration.PageSize" AllowSorting="true" ColumnWidth="200px">
+                <Columns>
+                    <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Id" Title="ID" Type="int" />
+                    <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Name" Title="Имя" Type="string" />
+                    <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Sex" Title="Пол" Type="string" />
+                    <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Weight" Title="Вес" Type="bool" />
+                </Columns>
+            </RadzenGrid>
+        }
     </ChildContent>
 </RadzenPanel>
 
 @code {
-    public Core.Models.CatEntity[] Cats { get; set; }
+    #region Public and private fields and properties
+
+    public IEnumerable<Core.Models.CatEntity> Cats { get; set; }
     public Core.Models.CatEntity Cat { get; set; }
     private readonly DataConvert _convert = DataConvert.Instance;
+
+    #endregion
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,52 +84,152 @@
         await ActionReadAsync().ConfigureAwait(false);
     }
 
+    #region Public and private methods - CRUD
+
     private async Task ActionCreateAsync()
     {
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
-
+        try
+        {
+            var entity = new Core.Models.CatEntity("New cat", 'М', 1.23F);
+            await Data.CreateAsync(entity).ConfigureAwait(false);
+            var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Создание выполнено успешно.", Duration = 4000 };
+            Notification.Notify(message);
+        }
+        catch (Exception ex)
+        {
+            var message = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Ошибка создания!", Detail = ex.Message, Duration = 4000 };
+            Notification.Notify(message);
+        }
+        await ActionReadAsync().ConfigureAwait(false);
     }
 
     private async Task ActionReadAsync()
     {
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
-
-        var entities = new Core.Models.BaseEntity[0];
-        var task = Task.Run(async () =>
+        try
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
-            entities = await Data.ReadAsync().ConfigureAwait(false);
-        });
-        task.Wait();
-        Cats = _convert.ToCats(entities);
+            Cats = _convert.ToCats(await Data.ReadAsync().ConfigureAwait(false));
+            var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Чтение выполнено успешно.", Duration = 4000 };
+            Notification.Notify(message);
+        }
+        catch (Exception ex)
+        {
+            var message = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Ошибка чтения!", Detail = ex.Message, Duration = 4000 };
+            Notification.Notify(message);
+        }
     }
 
     private async Task ActionUpdateAsync()
     {
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
-
+        try
+        {
+            if (Cat is null || Cat.Id <= 0)
+            {
+                var messageCheck = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Ошибка!", Detail = "Запись не выделена.", Duration = 4000 };
+                Notification.Notify(messageCheck);
+                return;
+            }
+            var question = $"Обновить вес кота {Cat.Name} [ID: {Cat.Id}]?";
+            var isDelete = await Dialog.OpenAsync("Выполнить действие", ds =>
+                @<div>
+                    <RadzenLabel Style="margin-bottom: 1rem" Text=@question/>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <RadzenButton Text="Да" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px"
+                                          ButtonStyle="ButtonStyle.Secondary"/>
+                            <RadzenButton Text="Отмена" Click="() => ds.Close(false)" Style="margin-bottom: 10px; width: 150px"
+                                          ButtonStyle="ButtonStyle.Primary"/>
+                        </div>
+                    </div>
+                </div>).ConfigureAwait(false);
+            if (isDelete)
+            {
+                Cat.Weight += 0.1F;
+                await Data.UpdateAsync(Cat).ConfigureAwait(false);
+                var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Обновление выполнено успешно.", Duration = 4000 };
+                Notification.Notify(message);
+            }
+            else
+            {
+                var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Отмена.", Detail = "Обновление не выполнено.", Duration = 4000 };
+                Notification.Notify(message);
+            }
+        }
+        catch (Exception ex)
+        {
+            var message = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Ошибка обновления!", Detail = ex.Message, Duration = 4000 };
+            Notification.Notify(message);
+        }
+        await ActionReadAsync().ConfigureAwait(false);
     }
 
     private async Task ActionDeleteAsync()
     {
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
-
+        try
+        {
+            if (Cat is null || Cat.Id <= 0)
+            {
+                var messageCheck = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Ошибка!", Detail = "Запись не выделена.", Duration = 4000 };
+                Notification.Notify(messageCheck);
+                return;
+            }
+            var question = $"Удалить кота {Cat.Name} [ID: {Cat.Id}]?";
+            var isDelete = await Dialog.OpenAsync("Выполнить действие", ds =>
+                @<div>
+                    <RadzenLabel Style="margin-bottom: 1rem" Text=@question/>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <RadzenButton Text="Да" Click="() => ds.Close(true)" Style="margin-bottom: 10px; width: 150px"
+                                          ButtonStyle="ButtonStyle.Secondary"/>
+                            <RadzenButton Text="Отмена" Click="() => ds.Close(false)" Style="margin-bottom: 10px; width: 150px"
+                                          ButtonStyle="ButtonStyle.Primary"/>
+                        </div>
+                    </div>
+                </div>).ConfigureAwait(false);
+            if (isDelete)
+            {
+                await Data.DeleteAsync(Cat).ConfigureAwait(false);
+                var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Удаление выполнено успешно.", Duration = 4000 };
+                Notification.Notify(message);
+            }
+            else
+            {
+                var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Отмена.", Detail = "Удаление не выполнено.", Duration = 4000 };
+                Notification.Notify(message);
+            }
+        }
+        catch (Exception ex)
+        {
+            var message = new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Ошибка удаления!", Detail = ex.Message, Duration = 4000 };
+            Notification.Notify(message);
+        }
+        await ActionReadAsync().ConfigureAwait(false);
     }
+
+    #endregion
+
+    #region Public and private methods - RadzenGrid
 
     private async Task RowSelectAsync(Core.Models.CatEntity cat)
     {
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        Cat = cat;
     }
 
     private async Task RowDoubleClickAsync(Core.Models.CatEntity cat)
     {
+        Cat = cat;
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
-        await Dialog.OpenAsync<Components.CatEntityComponent>($"Запись: {cat.Name}",
+        await Dialog.OpenAsync<Components.CatEntityComponent>($"Запись: {Cat.Name}",
         new Dictionary<string, object>()
         {
-            { "Cat", cat },
-        },
-        new DialogOptions() { Width = "1024px", Height = "768px" });
-        Console.WriteLine("RowDoubleClick 2");
+                { "Cat", Cat },
+            },
+        new DialogOptions() { Width = "1024px", Height = "768px" }).ConfigureAwait(false);
     }
+
+    #endregion
 }

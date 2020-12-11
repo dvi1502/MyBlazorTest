@@ -1,0 +1,100 @@
+﻿@page "/deviceEntityComponent"
+@using MyBlazorTest.Core
+@inject DataAccess Data
+@inject DialogService Dialog
+@inject NotificationService Notification
+@inject TooltipService Tooltip
+
+<RadzenCard Style="margin-bottom: 0px;">
+    <div class="row" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+        <span Style="align-self: start; width: 15%; height: 25px; ">Name:</span>
+        <RadzenTextBox Style="align-self: end; width: 85%; height: 25px; " TValue="string" @bind-value=@Cat.Name Change=@(args => Change<string>(args, "Name")) />
+        <div class="col-md-6" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+            <br Style="margin-top: 5px; margin-left: 0px; margin-right: 0px; " />
+            <span Style="align-self: start; width: 38%; height: 25px; ">Sex:</span>
+            <RadzenTextBox Style="align-self: end; width: 60%; height: 25px; " @bind-value=@Cat.Sex Change=@(args => Change<string>(args, "Sex")) />
+        </div>
+        <div class="col-md-6" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+            <br Style="margin-top: 5px; margin-left: 0px; margin-right: 0px; " />
+            <span Style="align-self: start; width: 38%; height: 25px; ">Weigh:t</span>
+            <RadzenTextBox Style="align-self: end; width: 60%; height: 25px; " @bind-value=@Cat.Weight Change=@(args => Change<string>(args, "Weight")) />
+        </div>
+    </div>
+</RadzenCard>
+
+<br Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; " />
+<div class="row">
+    <div class="col-md-6" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+        <RadzenButton Click="@SaveAsync" Text="Сохранить" Style="margin-bottom: 10px; width: 150px" />
+    </div>
+    <div class="col-md-6" Style="margin-top: 0px; margin-left: 0px; margin-right: 0px; ">
+        <RadzenButton Click="@CancelAsync" ButtonStyle="ButtonStyle.Secondary" Text="Закрыть" Style="margin-bottom: 10px; width: 150px" />
+    </div>
+</div>
+
+<style>
+    html, body {
+        height: 100%;
+    }
+
+    .full-height {
+        height: 100%;
+    }
+</style>
+
+@code {
+    #region Public and private fields and properties
+
+    [Parameter]
+    public Core.Models.CatEntity Cat { get; set; }
+    [Parameter]
+    public EventCallback CallbackActionSaveAsync { get; set; }
+    [Parameter]
+    public EventCallback CallbackActionCancelAsync { get; set; }
+
+    private string _state = @"Отключено";
+
+    #endregion
+
+    #region Public and private methods
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        await base.OnInitializedAsync().ConfigureAwait(false);
+    }
+
+    private async Task GetDataAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+    }
+
+    private async Task SaveAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        var result = false;
+        Dialog.Close(true);
+        var message = result
+            ? new NotificationMessage { Severity = NotificationSeverity.Info, Summary = $"Устройство {Cat.Name}", Detail = "Сохранено успешно", Duration = 4000 }
+            : new NotificationMessage { Severity = NotificationSeverity.Error, Summary = $"Устройство {Cat.Name}", Detail = "Ошибка сохранения!", Duration = 4000 };
+        Notification.Notify(message);
+    }
+
+    private async Task CancelAsync()
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        Dialog.Close(false);
+    }
+
+    #endregion
+
+    private async Task Change<T>(T value, string name)
+    {
+        await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+        if (name.Equals("State"))
+        {
+            _state = Convert.ToBoolean(value) ? @"Работает" : @"Отключено";
+        }
+        StateHasChanged();
+    }
+}

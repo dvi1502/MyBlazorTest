@@ -167,11 +167,10 @@ namespace MyBlazorTest.Core
             }
         }
 
-        public void SessionClose(ISession session, ITransaction transaction)
+        public void SessionClose(ISession session, ITransaction transaction, [CallerMemberName] string memberName = "")
         {
             transaction?.Dispose();
             session?.Close();
-            session?.Disconnect();
         }
 
         public DataConfiguration Configuration { get; set; }
@@ -223,7 +222,7 @@ namespace MyBlazorTest.Core
             try
             {
                 transaction = session.BeginTransaction();
-                await session.SaveOrUpdateAsync(entity).ConfigureAwait(false);
+                await session.SaveAsync(entity).ConfigureAwait(false);
                 await session.FlushAsync().ConfigureAwait(false);
                 await transaction.CommitAsync().ConfigureAwait(false);
             }
@@ -290,16 +289,58 @@ namespace MyBlazorTest.Core
             return new BaseEntity[0];
         }
 
-        public async Task UpdateAsync(BaseEntity entity)
+        public async Task UpdateAsync(BaseEntity entity, [CallerMemberName] string memberName = "")
         {
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+            if (SessionFactory is null)
+                return;
+            var session = SessionOpen;
+            ITransaction transaction = null;
 
+            try
+            {
+                transaction = session.BeginTransaction();
+                await session.SaveOrUpdateAsync(entity).ConfigureAwait(false);
+                await session.FlushAsync().ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (!(transaction is null))
+                    await transaction.RollbackAsync().ConfigureAwait(false);
+                Console.WriteLine($"{memberName}. {ex.Message}");
+            }
+            finally
+            {
+                SessionClose(session, transaction);
+            }
         }
 
-        public async Task DeleteAsync(BaseEntity entity)
+        public async Task DeleteAsync(BaseEntity entity, [CallerMemberName] string memberName = "")
         {
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
+            if (SessionFactory is null)
+                return;
+            var session = SessionOpen;
+            ITransaction transaction = null;
 
+            try
+            {
+                transaction = session.BeginTransaction();
+                await session.DeleteAsync(entity).ConfigureAwait(false);
+                await session.FlushAsync().ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (!(transaction is null))
+                    await transaction.RollbackAsync().ConfigureAwait(false);
+                Console.WriteLine($"{memberName}. {ex.Message}");
+            }
+            finally
+            {
+                SessionClose(session, transaction);
+            }
         }
 
         #endregion

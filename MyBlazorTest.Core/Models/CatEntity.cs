@@ -8,6 +8,18 @@
 
         public virtual float Weight { get; set; }
 
+        public CatEntity()
+        {
+            //
+        }
+
+        public CatEntity(string name, char sex, float weight)
+        {
+            Name = name;
+            Sex = sex;
+            Weight = weight;
+        }
+
         public override string ToString()
         {
             return $"Name: {Name}. Sex: {Sex}. Weight: {Weight}";
