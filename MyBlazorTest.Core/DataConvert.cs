@@ -14,32 +14,22 @@ namespace MyBlazorTest.Core
 
         #region Constructor and destructor
 
-        public DataConvert() { SetupDefault(); }
-
-        public void SetupDefault()
-        {
-            // Default methods
-        }
-
-        public void Setup()
-        {
-            // Setup methods
-        }
+        public DataConvert() { }
 
         #endregion
 
         #region Public and private methods
 
-        public CatEntity[] ToCats(BaseEntity[] entities)
+        public T[] ToChilds<T>(BaseEntity[] entities) where T : class
         {
-            var result = new CatEntity[0];
+            var result = new T[0];
             if (!(entities is null) && entities.Length > 0)
             {
-                result = new CatEntity[entities.Length];
+                result = new T[entities.Length];
                 var i = 0;
                 foreach (var entity in entities)
                 {
-                    result[i] = (CatEntity)entity;
+                    result[i] = entity as T;
                     i++;
                 }
             }

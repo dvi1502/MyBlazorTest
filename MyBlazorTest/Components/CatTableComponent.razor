@@ -1,5 +1,6 @@
 ﻿@page "/catTableComponent"
 @using MyBlazorTest.Core
+@using MyBlazorTest.Core.Models
 <RadzenDialog />
 <RadzenNotification />
 <RadzenContextMenu />
@@ -109,7 +110,7 @@
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
         try
         {
-            Cats = _convert.ToCats(await Data.ReadAsync().ConfigureAwait(false));
+            Cats = _convert.ToChilds<CatEntity>(await Data.ReadAsync().ConfigureAwait(false));
             var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Чтение выполнено успешно.", Duration = 4000 };
             Notification.Notify(message);
         }
