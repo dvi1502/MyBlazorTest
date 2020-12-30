@@ -1,5 +1,6 @@
 ﻿@page "/"
-@inject MyBlazorTest.Core.DataAccess Data
+@using MyBlazorTest.Core.DAL
+@inject DataAccess DataAccess
 
 <RadzenDialog />
 <RadzenNotification />
@@ -9,12 +10,12 @@
 <h1>DataAccess</h1>
 
 <RadzenLabel Style="margin-left: 30px" Text="Session count:" />
-<RadzenNumeric Style="margin-left: 10px" TValue="int" @bind-value=@Data.SessionsCount
+<RadzenNumeric Style="margin-left: 10px" TValue="int" @bind-value=@DataAccess.SessionsCount
                Change=@(args => Change<int>(args, "SessionsCount")) />
 <RadzenLabel Style="margin-left: 30px" Text="IsOpen:" />
-<RadzenCheckBox Style="margin-left: 10px" TValue="bool" @bind-value=@Data.SessionsIsOpen Disabled="true" />
+<RadzenCheckBox Style="margin-left: 10px" TValue="bool" value=@DataAccess.SessionsIsOpen Disabled="true" />
 <RadzenLabel Style="margin-left: 30px" Text="IsConnected:" />
-<RadzenCheckBox Style="margin-left: 10px" TValue="bool" @bind-value=@Data.SessionsIsConnected Disabled="true" />
+<RadzenCheckBox Style="margin-left: 10px" TValue="bool" value=@DataAccess.SessionsIsConnected Disabled="true" />
 
 @code {
     private bool _update;

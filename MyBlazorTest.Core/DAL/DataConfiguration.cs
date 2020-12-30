@@ -1,4 +1,4 @@
-﻿namespace MyBlazorTest.Core
+﻿namespace MyBlazorTest.Core.DAL
 {
     public class DataConfiguration
     {

@@ -1,11 +1,12 @@
 ﻿@page "/catTableComponent"
-@using MyBlazorTest.Core
+@using MyBlazorTest.Core.DAL
 @using MyBlazorTest.Core.Models
 <RadzenDialog />
 <RadzenNotification />
 <RadzenContextMenu />
 <RadzenTooltip />
-@inject DataAccess Data
+@inject DataAccess DataAccess
+@inject DataConvert DataConvert
 @inject DialogService Dialog
 @inject NotificationService Notification
 @inject TooltipService Tooltip
@@ -15,13 +16,13 @@
         <RadzenLabel Text="Configuration" />
     </HeaderTemplate>
     <ChildContent>
-        <RadzenCheckBox TValue="bool" @bind-value=@Data.Configuration.Use />
+        <RadzenCheckBox TValue="bool" @bind-value=@DataAccess.Configuration.Use />
         <RadzenLabel Text=" Use" />
-        <RadzenCheckBox TValue="bool" @bind-value=@Data.Configuration.OrderAsc />
+        <RadzenCheckBox TValue="bool" @bind-value=@DataAccess.Configuration.OrderAsc />
         <RadzenLabel Text=" Order ascending" />
-        <RadzenNumeric TValue="int" Min="1" Max="999_999" @bind-value=@Data.Configuration.PageNo />
+        <RadzenNumeric TValue="int" Min="1" Max="999_999" @bind-value=@DataAccess.Configuration.PageNo />
         <RadzenLabel Text=" PageNo" />
-        <RadzenNumeric TValue="int" Min="1" Max="1_000" @bind-value=@Data.Configuration.PageSize />
+        <RadzenNumeric TValue="int" Min="1" Max="1_000" @bind-value=@DataAccess.Configuration.PageSize />
         <RadzenLabel Text=" PageSize" />
     </ChildContent>
 </RadzenPanel>
@@ -56,7 +57,7 @@
             <RadzenGrid Data=@Cats TItem="Core.Models.CatEntity" Value=@Cat
                         RowSelect=@(args => RowSelectAsync(args)) RowDoubleClick=@(args => RowDoubleClickAsync(args))
                         AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" FilterMode="FilterMode.Advanced"
-                        AllowPaging="true" PageSize="@Data.Configuration.PageSize" AllowSorting="true" ColumnWidth="200px">
+                        AllowPaging="true" PageSize="@DataAccess.Configuration.PageSize" AllowSorting="true" ColumnWidth="200px">
                 <Columns>
                     <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Id" Title="ID" Type="int" />
                     <RadzenGridColumn TItem="Core.Models.CatEntity" Property="Name" Title="Имя" Type="string" />
@@ -73,7 +74,6 @@
 
     public IEnumerable<Core.Models.CatEntity> Cats { get; set; }
     public Core.Models.CatEntity Cat { get; set; }
-    private readonly DataConvert _convert = DataConvert.Instance;
 
     #endregion
 
@@ -93,7 +93,7 @@
         try
         {
             var entity = new Core.Models.CatEntity("New cat", 'М', 1.23F);
-            await Data.CreateAsync(entity).ConfigureAwait(false);
+            await DataAccess.CreateAsync(entity).ConfigureAwait(false);
             var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Создание выполнено успешно.", Duration = 4000 };
             Notification.Notify(message);
         }
@@ -110,7 +110,7 @@
         await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
         try
         {
-            Cats = _convert.ToChilds<CatEntity>(await Data.ReadAsync<CatEntity>().ConfigureAwait(false));
+            Cats = DataConvert.ToChilds<CatEntity>(await DataAccess.ReadAsync<CatEntity>().ConfigureAwait(false));
             var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Чтение выполнено успешно.", Duration = 4000 };
             Notification.Notify(message);
         }
@@ -148,7 +148,7 @@
             if (isDelete)
             {
                 Cat.Weight += 0.1F;
-                await Data.UpdateAsync(Cat).ConfigureAwait(false);
+                await DataAccess.UpdateAsync(Cat).ConfigureAwait(false);
                 var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Обновление выполнено успешно.", Duration = 4000 };
                 Notification.Notify(message);
             }
@@ -192,7 +192,7 @@
                 </div>).ConfigureAwait(false);
             if (isDelete)
             {
-                await Data.DeleteAsync(Cat).ConfigureAwait(false);
+                await DataAccess.DeleteAsync(Cat).ConfigureAwait(false);
                 var message = new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Успех.", Detail = "Удаление выполнено успешно.", Duration = 4000 };
                 Notification.Notify(message);
             }

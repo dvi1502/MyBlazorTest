@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MyBlazorTest.Core;
+using MyBlazorTest.Core.DAL;
 using MyBlazorTest.Data;
 using Radzen;
 
@@ -27,6 +27,7 @@ namespace MyBlazorTest
             services.AddScoped<TooltipService>();
             services.AddScoped<ContextMenuService>();
             services.AddSingleton<DataAccess>();
+            services.AddSingleton<DataConvert>();
             services.AddSingleton<WeatherForecastService>();
             services.AddRazorPages();
             services.AddServerSideBlazor();

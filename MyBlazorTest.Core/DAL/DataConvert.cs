@@ -1,17 +1,7 @@
-﻿using MyBlazorTest.Core.Models;
-using System.Threading;
-
-namespace MyBlazorTest.Core
+﻿namespace MyBlazorTest.Core.DAL
 {
     public class DataConvert
     {
-        #region Design pattern "Lazy Singleton"
-
-        private static DataConvert _instance;
-        public static DataConvert Instance => LazyInitializer.EnsureInitialized(ref _instance);
-
-        #endregion
-
         #region Constructor and destructor
 
         public DataConvert() { }

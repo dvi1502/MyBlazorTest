@@ -1,31 +1,18 @@
 ﻿using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
-using MyBlazorTest.Core.Models;
 using NHibernate;
 using NHibernate.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MyBlazorTest.Core
+namespace MyBlazorTest.Core.DAL
 {
-    public class DataAccess: INotifyPropertyChanged
+    public class DataAccess
     {
-        #region INotifyPropertyChanged
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyRaised([CallerMemberName] string memberName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(memberName));
-        }
-
-        #endregion
-
         #region Public and private fields and properties
 
         private ISessionFactory _sessionFactory;
@@ -98,11 +85,9 @@ namespace MyBlazorTest.Core
                     }
                 }
                 _sessionsCount = value;
-                OnPropertyRaised();
             }
         }
 
-        private bool _sessionsIsConnected;
         public bool SessionsIsConnected
         {
             get
@@ -117,14 +102,8 @@ namespace MyBlazorTest.Core
                 }
                 return false;
             }
-            set
-            {
-                _sessionsIsConnected = value;
-                OnPropertyRaised();
-            }
         }
 
-        private bool _sessionsIsOpen;
         public bool SessionsIsOpen
         {
             get
@@ -139,12 +118,6 @@ namespace MyBlazorTest.Core
                 }
                 return false;
             }
-            set
-            {
-                _sessionsIsOpen = value; 
-                OnPropertyRaised();
-            }
-
         }
 
         private ISession[] _sessions;
@@ -159,7 +132,6 @@ namespace MyBlazorTest.Core
                     if (_sessions[i] is null)
                     {
                         _sessions[i] = SessionFactory.OpenSession();
-                        //Console.WriteLine($"SessionOpen: _sessions[{i}]: IsOpen: {_sessions[i].IsOpen} IsConnected: {_sessions[i].IsConnected} ");
                         return _sessions[i];
                     }
                 }
@@ -199,7 +171,7 @@ namespace MyBlazorTest.Core
             _sessions = new ISession[SessionsCount];
             _ = SessionsIsConnected;
             _ = SessionsIsOpen;
-            Configuration = new Core.DataConfiguration();
+            Configuration = new DataConfiguration();
         }
 
         public void Setup()
