@@ -167,7 +167,7 @@ namespace MyBlazorTest.Core
             }
         }
 
-        public void SessionClose(ISession session, ITransaction transaction, [CallerMemberName] string memberName = "")
+        public void SessionClose(ISession session, ITransaction transaction)
         {
             transaction?.Dispose();
             session?.Close();
@@ -211,7 +211,7 @@ namespace MyBlazorTest.Core
 
         #region Public and private methods - CRUD
 
-        public async Task CreateAsync(BaseEntity entity, [CallerMemberName] string memberName = "")
+        public async Task CreateAsync<T>(T entity, [CallerMemberName] string memberName = "") where T : class
         {
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
             if (SessionFactory is null)
@@ -238,47 +238,41 @@ namespace MyBlazorTest.Core
             }
         }
 
-        public async Task<BaseEntity[]> ReadAsync([CallerMemberName] string memberName = "")
+        public async Task<T[]> ReadAsync<T>([CallerMemberName] string memberName = "") where T : class
         {
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
             if (SessionFactory is null)
-                return new BaseEntity[0];
+                return new T[0];
             using var session = SessionOpen;
             
             try
             {
                 if (!(Configuration is null) && Configuration.Use)
                 {
-                    List<BaseEntity> items;
+                    List<T> items;
                     if (Configuration.OrderAsc)
                     {
-                        items = await session.Query<BaseEntity>()
-                            //.Where(ent => !string.IsNullOrEmpty(ent.Name))
-                            .OrderBy(p => p.Id)
+                        items = await session.Query<T>()
+                            .OrderBy(ent => ent)
                             .Skip(Configuration.PageNo * Configuration.PageSize)
                             .Take(Configuration.PageSize)
-                            //.Fetch(ent => ent.Id)
                             .ToListAsync().ConfigureAwait(false);
                     }
                     else
                     {
-                        items = await session.Query<BaseEntity>()
-                            //.Where(ent => !string.IsNullOrEmpty(ent.Name))
-                            .OrderByDescending(p => p.Id)
+                        items = await session.Query<T>()
+                            .OrderByDescending(ent => ent)
                             .Skip(Configuration.PageNo * Configuration.PageSize)
                             .Take(Configuration.PageSize)
-                            //.Fetch(ent => ent.Id)
                             .ToListAsync().ConfigureAwait(false);
                     }
-                    var ids = items.Select(ent => ent.Id).ToList();
-                    var entities = await session.Query<BaseEntity>()
-                        .Where(ent => ids.Contains(ent.Id))
-                        //.OrderByDescending(ent => ent.Id)
-                        //.FetchMany(ent => ent.Id)
+                    var ids = items.Select(ent => ent).ToList();
+                    var entities = await session.Query<T>()
+                        .Where(ent => ids.Contains(ent))
                         .ToListAsync().ConfigureAwait(false);
                     return entities.ToArray();
                 }
-                var entitiesAll = await session.Query<BaseEntity>()
+                var entitiesAll = await session.Query<T>()
                     .ToListAsync().ConfigureAwait(false);
                 return entitiesAll.ToArray();
             }
@@ -286,10 +280,10 @@ namespace MyBlazorTest.Core
             {
                 Console.WriteLine($"{memberName}. {ex.Message}");
             }
-            return new BaseEntity[0];
+            return new T[0];
         }
 
-        public async Task UpdateAsync(BaseEntity entity, [CallerMemberName] string memberName = "")
+        public async Task UpdateAsync<T>(T entity, [CallerMemberName] string memberName = "") where T : class
         {
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
             if (SessionFactory is null)
@@ -316,7 +310,7 @@ namespace MyBlazorTest.Core
             }
         }
 
-        public async Task DeleteAsync(BaseEntity entity, [CallerMemberName] string memberName = "")
+        public async Task DeleteAsync<T>(T entity, [CallerMemberName] string memberName = "") where T : class
         {
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);
             if (SessionFactory is null)

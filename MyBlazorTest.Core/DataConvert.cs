@@ -20,7 +20,7 @@ namespace MyBlazorTest.Core
 
         #region Public and private methods
 
-        public T[] ToChilds<T>(BaseEntity[] entities) where T : class
+        public T[] ToChilds<T>(T[] entities) where T : class
         {
             var result = new T[0];
             if (!(entities is null) && entities.Length > 0)
@@ -29,7 +29,7 @@ namespace MyBlazorTest.Core
                 var i = 0;
                 foreach (var entity in entities)
                 {
-                    result[i] = entity as T;
+                    result[i] = entity;
                     i++;
                 }
             }

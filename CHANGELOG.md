@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.45] - 2020-12-30
+### Changed
+- MyBlazorTest.Core project: added generic type T
+- MyBlazorTest project: added generic type T
+
 ## [0.1.41] - 2020-12-28
 ### Changed
 - MyBlazorTest.Core project: DataConvert.ToChilds method instead DataConvert.ToCats

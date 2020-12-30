@@ -1,7 +1,8 @@
 ﻿namespace MyBlazorTest.Core.Models
 {
-    public class CatEntity : BaseEntity
+    public class CatEntity
     {
+        public virtual int Id { get; set; }
         public virtual string Name { get; set; }
 
         public virtual char Sex { get; set; }
